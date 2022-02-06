@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Builder
 public class CotacaoResponseDTO {
     private float vlTotalFrete;
-    private LocalDate dataPrevistaEntrega;
+    private String dataPrevistaEntrega;
     private String cepOrigem;
     private String cepDestino;
 }
