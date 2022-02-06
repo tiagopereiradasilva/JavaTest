@@ -3,17 +3,16 @@ package br.com.sigabem.web.controller;
 import br.com.sigabem.service.CotacaoService;
 import br.com.sigabem.web.dto.CotacaoRequestDTO;
 import br.com.sigabem.web.dto.CotacaoResponseDTO;
+import br.com.sigabem.web.viacepconsumer.ViaCepResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @ResponseBody
-@RequestMapping("cotacao")
+@RequestMapping("/cotacao")
 public class CotacaoController {
     private CotacaoService cotacaoService;
 
@@ -21,7 +20,9 @@ public class CotacaoController {
         this.cotacaoService = cotacaoService;
     }
 
+    @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<CotacaoResponseDTO> savar(@RequestBody CotacaoRequestDTO cotacaoRequestDTO){
-        return null;
+        return ResponseEntity.ok(cotacaoService.salvar(cotacaoRequestDTO));
     }
 }
