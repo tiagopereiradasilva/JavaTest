@@ -9,4 +9,5 @@ import lombok.Setter;
 public class ViaCepResponse {
     private String ddd;
     private String uf;
+    private boolean erro;
 }
