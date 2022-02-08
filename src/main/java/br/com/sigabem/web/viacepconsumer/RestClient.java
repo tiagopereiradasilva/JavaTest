@@ -1,12 +1,11 @@
 package br.com.sigabem.web.viacepconsumer;
 
-import br.com.sigabem.domain.entity.Cotacao;
+import br.com.sigabem.exception.ViaCepConsumerException;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 
 import java.util.Map;
 
@@ -25,9 +24,10 @@ public class RestClient {
 
     public ViaCepConsumerResponse doGet(String endpoint, Map<String, String> path){
         Mono<ViaCepResponse> monoResponse1 = this.webClient
-                                    .get()
-                                    .uri(endpoint, path.get("cepOrigem"))
+                .get()
+                .uri(endpoint, path.get("cepOrigem"))
                 .retrieve()
+                .onStatus(HttpStatus::is4xxClientError, clientResponse -> Mono.error(new ViaCepConsumerException("Cep de origem é inválido")))
                 .bodyToMono(ViaCepResponse.class);
 
 
@@ -35,9 +35,13 @@ public class RestClient {
                 .get()
                 .uri(endpoint, path.get("cepDestinatario"))
                 .retrieve()
+                .onStatus(HttpStatus::is4xxClientError, clientResponse -> Mono.error(new ViaCepConsumerException("Cep de destino é inválido")))
                 .bodyToMono(ViaCepResponse.class);
 
         ViaCepConsumerResponse viaCepConsumerResponse = Mono.zip(monoResponse1, monoResponse2).map(responses -> {
+            if(responses.getT1().isErro() || responses.getT2().isErro()){
+                throw new ViaCepConsumerException("Certifique-se de que os ceps informados são existentes");
+            }
             ViaCepConsumerResponse response = new ViaCepConsumerResponse();
             response.setDddOrigem(responses.getT1().getDdd());
             response.setUfOrigem(responses.getT1().getUf());
