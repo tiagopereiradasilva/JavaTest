@@ -1,5 +1,6 @@
 package br.com.sigabem.web.controller;
 
+import br.com.sigabem.exception.StandardErrorResponse;
 import br.com.sigabem.service.CotacaoService;
 import br.com.sigabem.web.dto.CotacaoRequestDTO;
 import br.com.sigabem.web.dto.CotacaoResponseDTO;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Controller
 @ResponseBody
@@ -30,11 +33,15 @@ public class CotacaoController {
                     description = "Sucesso ao criar cotação",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = CotacaoResponseDTO.class))}
-            )
+            ),
+            @ApiResponse(responseCode = "400",
+                    description = "Parâmetro de entrada inválidos",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = StandardErrorResponse.class))})
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<CotacaoResponseDTO> salvar(@RequestBody CotacaoRequestDTO cotacaoRequestDTO){
+    public ResponseEntity<CotacaoResponseDTO> salvar(@RequestBody @Valid CotacaoRequestDTO cotacaoRequestDTO){
         return ResponseEntity.ok(cotacaoService.salvar(cotacaoRequestDTO));
     }
 }
